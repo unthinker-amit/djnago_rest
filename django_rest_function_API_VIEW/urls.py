@@ -20,5 +20,5 @@ from api import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',views.student_api.as_view()),
-    path('api/<int:pk>',views.student_api_pk.as_view()),
+    path('api/<int:pk>',views.student_api_RetrieveUpdateDestroy.as_view()),
 ]
