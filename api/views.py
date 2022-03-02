@@ -15,7 +15,7 @@ from .serializers import studentSerializer
 #         return Response({'data':request.data,'msg':'hello this is the post'}) 
 
 
-@api_view(['GET',"POST","PUT"])
+@api_view(['GET',"POST","PUT","DELETE"])
 def student_api(request):
     if request.method=="GET":
         id =request.data.get('id')
@@ -37,8 +37,15 @@ def student_api(request):
     if request.method=="PUT":
         id=request.data.get("id")
         stu=StudentModel.objects.get(pk=id)
-        serializer=studentSerializer(stu,data=request.data,partial=True)
+        serializer=studentSerializer(stu,data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"data":"data updated"})
         return Response(serializer.errors)
+
+        
+    if request.method=="DELETE":
+        id=request.data.get("id")
+        stu=StudentModel.objects.get(pk=id)
+        stu.delete()
+        return Response({"data":"data deleted"})
