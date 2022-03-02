@@ -1,12 +1,44 @@
+from functools import partial
 import imp
 from django.shortcuts import render
+from api.models import StudentModel
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .serializers import studentSerializer
 
 # Create your views here.
-@api_view(['GET','POST'])
-def hello_world(request):
+# @api_view(['GET','POST'])
+# def hello_world(request):
+#     if request.method=="GET":
+#         return Response({'data':request.data,'msg':'hello this is the post'}) 
+#     if request.method=="POST":
+#         return Response({'data':request.data,'msg':'hello this is the post'}) 
+
+
+@api_view(['GET',"POST","PUT"])
+def student_api(request):
     if request.method=="GET":
-        return Response({'data':request.data,'msg':'hello this is the post'}) 
+        id =request.data.get('id')
+        if id is not None:
+            stu = StudentModel.objects.get(id=id)
+            serializer=studentSerializer(stu)
+            return Response(serializer.data)
+        stu=StudentModel.objects.all()
+        serializer=studentSerializer(stu,many=True)
+        return Response(serializer.data)
+
     if request.method=="POST":
-        return Response({'data':request.data,'msg':'hello this is the post'}) 
+        serializer=studentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data":"data created"})
+        return Response(serializer.errors)
+    
+    if request.method=="PUT":
+        id=request.data.get("id")
+        stu=StudentModel.objects.get(pk=id)
+        serializer=studentSerializer(stu,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data":"data updated"})
+        return Response(serializer.errors)
