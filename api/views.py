@@ -15,10 +15,10 @@ from .serializers import studentSerializer
 #         return Response({'data':request.data,'msg':'hello this is the post'}) 
 
 
-@api_view(['GET',"POST","PUT","DELETE"])
-def student_api(request):
+@api_view(['GET',"POST","PUT","PATCH","DELETE"])
+def student_api(request,pk=None):
     if request.method=="GET":
-        id =request.data.get('id')
+        id =pk
         if id is not None:
             stu = StudentModel.objects.get(id=id)
             serializer=studentSerializer(stu)
@@ -35,7 +35,7 @@ def student_api(request):
         return Response(serializer.errors)
     
     if request.method=="PUT":
-        id=request.data.get("id")
+        id=pk
         stu=StudentModel.objects.get(pk=id)
         serializer=studentSerializer(stu,data=request.data)
         if serializer.is_valid():
@@ -43,9 +43,17 @@ def student_api(request):
             return Response({"data":"data updated"})
         return Response(serializer.errors)
 
+    if request.method=="PATCH":
+        id=pk
+        stu=StudentModel.objects.get(pk=id)
+        serializer=studentSerializer(stu,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"data":"data updated"})
+        return Response(serializer.errors)
         
     if request.method=="DELETE":
-        id=request.data.get("id")
+        id=pk
         stu=StudentModel.objects.get(pk=id)
         stu.delete()
         return Response({"data":"data deleted"})
